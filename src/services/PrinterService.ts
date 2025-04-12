@@ -246,7 +246,7 @@ export class PrinterService {
 
     // Format each item with proper spacing and alignment
     const formattedItems = order.items.map(item => {
-      const quantity = item.quantity.toString().padEnd(8);
+      const quantity = Math.floor(item.quantity).toString().padEnd(8);
       const name = item.name.padEnd(24).substring(0, 24); // Limit to 24 chars
       const unitPrice = `${item.price.toFixed(2)}`.padStart(9);
       const total = `${(item.quantity * item.price).toFixed(2)}`.padStart(10);
