@@ -199,24 +199,8 @@ export class PrinterService {
       console.log(`Table: ${order.table}`);
       console.log('------------------------------------');
       
-      // Format order data in a more readable structure
-      const receiptContent = 
-`*** ORDER DETAILS ***
-
-Table: ${order.table}
-
-ITEMS:
-${order.items.map(item => `- ${item.quantity}x ${item.name}
-  Price: $${item.price.toFixed(2)}
-  Subtotal: $${(item.price * item.quantity).toFixed(2)}`).join('\n\n')}
-
----------------------
-TOTAL: $${order.total.toFixed(2)}
-
-Order JSON:
-${JSON.stringify(order, null, 2)}
-
-Thank you for your order!`;
+      // Format the receipt content in a structured, professionally formatted way
+      const receiptContent = this.formatReceipt(order);
 
       // Print preview to console
       console.log('------- RECEIPT CONTENT -------');
@@ -224,10 +208,10 @@ Thank you for your order!`;
       console.log('------------------------------');
 
       // Write to file
-      fs.writeFileSync(this.receiptFilePath, receiptContent);
+      await fs.writeFileSync(this.receiptFilePath, receiptContent);
       
       // Use system command to print with raw option
-      const execPromise = promisify(exec);
+      const execPromise = await promisify(exec);
       await execPromise(`lpr -P ${this.printerList[0]} -o raw ${this.receiptFilePath}`);
       
       console.log('✅ PRINT JOB SENT');
@@ -238,6 +222,57 @@ Thank you for your order!`;
       console.log('❌ PRINT JOB FAILED');
       return false;
     }
+  }
+
+  private formatReceipt(order: Order): string {
+    // Get current date and time
+    const now = new Date();
+    const date = now.toLocaleDateString('es-MX', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    }).replace(/\//g, '/');
+    const time = now.toLocaleTimeString('es-MX', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    });
+
+    // Restaurant information - Replace with actual restaurant info
+    const restaurantInfo = [
+      'Ramuri Restaurante & Cervecería',
+      'Av. Revolución 123, Tijuana, BC',
+      'Tel: 664-123-4567',
+      `Fecha: ${date}      Hora: ${time}`,
+      `Mesero: Carlos`
+    ].join('\n');
+
+    // Create divider line
+    const divider = '---------------------------------------';
+
+    // Create header for items table
+    const header = 'Cant    Producto                P. Unit    Total';
+
+    // Format each item with proper spacing and alignment
+    const formattedItems = order.items.map(item => {
+      const quantity = item.quantity.toString().padEnd(8);
+      const name = item.name.padEnd(24).substring(0, 24); // Limit to 24 chars
+      const unitPrice = `${item.price.toFixed(2)}`.padStart(9);
+      const total = `${(item.quantity * item.price).toFixed(2)}`.padStart(10);
+      
+      return `${quantity}${name}${unitPrice}${total}`;
+    }).join('\n');
+
+    // Format the total section
+    const totalSection = [
+      divider,
+      `${'Subtotal:'.padEnd(33)}${order.total.toFixed(2)}`,
+      `${'IVA (16%):'.padEnd(33)}${(order.total * 0.16).toFixed(2)}`,
+      `${'Total:'.padEnd(33)}${(order.total * 1.16).toFixed(2)}`
+    ].join('\n');
+
+    // Build the complete receipt
+    return `${restaurantInfo}\n\n${divider}\n${header}\n${divider}\n${formattedItems}\n${totalSection}\n\nGracias por su preferencia!\nTable: ${order.table}\n`;
   }
   
   async sendToPrinter(payload: any): Promise<{success: boolean, message: string}> {
@@ -266,7 +301,7 @@ Thank you for your order!`;
       };
     }
     
-    // If payload is an Order, use the printOrder method
+    // If payload is an Order, use the printOrder method ONLY
     if (payload && typeof payload === 'object' && 'table' in payload && 'items' in payload) {
       const success = await this.printOrder(payload as Order);
       
@@ -282,47 +317,21 @@ Thank you for your order!`;
         message: "Order printed successfully"
       };
     } else {
-      // For other types of payloads, you might need different printing logic
+      // For non-Order payloads, format and print as needed
       try {
         console.log('\n========== PRINTING CUSTOM PAYLOAD ==========');
         
-        await this.printer.clear();
-        
-        // Print payload as a generic receipt
-        this.printer.alignCenter();
-        this.printer.bold(true);
-        this.printer.println('RECEIPT');
-        this.printer.bold(false);
-        this.printer.newLine();
-        
-        this.printer.alignLeft();
-        
-        // Handle different payload types
-        if (typeof payload === 'string') {
-          this.printer.println(payload);
-          console.log(`Payload (string): ${payload}`);
-        } else if (typeof payload === 'object') {
-          // Format and print JSON object in a readable way
-          console.log('Payload (object):');
-          this.printer.println('*** JSON DATA ***');
-          this.printer.newLine();
+        // For non-Order data, use a simple formatting approach
+        // const payloadStr = typeof payload === 'string' 
+        //   ? payload 
+        //   : `Payload data: ${JSON.stringify(payload, null, 2)}`;
           
-          // Format the JSON with indentation for readability
-          const formattedJson = JSON.stringify(payload, null, 2);
-          
-          // Split the formatted JSON by lines and print each line
-          formattedJson.split('\n').forEach(line => {
-            this.printer.println(line);
-            console.log(line);
-          });
-        } else {
-          const payloadStr = String(payload);
-          this.printer.println(payloadStr);
-          console.log(`Payload (${typeof payload}): ${payloadStr}`);
-        }
+        // Write to file
+        //fs.writeFileSync(this.receiptFilePath, payloadStr);
         
-        this.printer.cut();
-        await this.printer.execute();
+        // Use system command to print with raw option
+        // const execPromise = promisify(exec);
+        // await execPromise(`lpr -P ${this.printerList[0]} -o raw ${this.receiptFilePath}`);
         
         console.log('✅ PAYLOAD PRINTED SUCCESSFULLY');
         console.log('==========================================\n');

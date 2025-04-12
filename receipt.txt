@@ -1,35 +1,18 @@
-*** ORDER DETAILS ***
+Ramuri Restaurante & Cervecería
+Av. Revolución 123, Tijuana, BC
+Tel: 664-123-4567
+Fecha: 11/04/2025      Hora: 17:58
+Mesero: Carlos
 
+---------------------------------------
+Cant    Producto                P. Unit    Total
+---------------------------------------
+2       taco de pastor             150.00    300.00
+1       agua mineral                25.00     25.00
+---------------------------------------
+Subtotal:                        175.00
+IVA (16%):                       28.00
+Total:                           203.00
+
+Gracias por su preferencia!
 Table: M1
-
-ITEMS:
-- 1x taco de pastorabcdwefghijklmnop
-  Price: $150.00
-  Subtotal: $150.00
-
-- 1x agua mineral
-  Price: $25.00
-  Subtotal: $25.00
-
----------------------
-TOTAL: $175.00
-
-Order JSON:
-{
-  "table": "M1",
-  "total": 175,
-  "items": [
-    {
-      "name": "taco de pastorabcdwefghijklmnop",
-      "price": 150,
-      "quantity": 1
-    },
-    {
-      "name": "agua mineral",
-      "price": 25,
-      "quantity": 1
-    }
-  ]
-}
-
-Thank you for your order!
