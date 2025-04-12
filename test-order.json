@@ -1,0 +1,15 @@
+{
+    "table": "M1",
+    "total": 175,
+    "items": [
+        {
+            "name":"taco de pastorabcdwefghijklmnop",
+            "price": 150,
+            "quantity": 1
+        },{
+            "name":"agua mineral",
+            "price": 25,
+            "quantity": 1
+        }
+    ]
+} 

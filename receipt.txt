@@ -1,0 +1,35 @@
+*** ORDER DETAILS ***
+
+Table: M1
+
+ITEMS:
+- 1x taco de pastorabcdwefghijklmnop
+  Price: $150.00
+  Subtotal: $150.00
+
+- 1x agua mineral
+  Price: $25.00
+  Subtotal: $25.00
+
+---------------------
+TOTAL: $175.00
+
+Order JSON:
+{
+  "table": "M1",
+  "total": 175,
+  "items": [
+    {
+      "name": "taco de pastorabcdwefghijklmnop",
+      "price": 150,
+      "quantity": 1
+    },
+    {
+      "name": "agua mineral",
+      "price": 25,
+      "quantity": 1
+    }
+  ]
+}
+
+Thank you for your order!

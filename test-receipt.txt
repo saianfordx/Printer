@@ -1,0 +1,12 @@
+===== ORDER RECEIPT =====
+
+Table: M1
+-------------------------
+ITEMS:
+1x taco de pastorabcdwefghijklmnop - $150.00
+1x agua mineral - $25.00
+-------------------------
+TOTAL: $175.00
+
+Thank you for your order!
+=========================
