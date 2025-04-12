@@ -268,35 +268,30 @@ export class PrinterService {
       `Table: ${order.table}`
     ].join('\n');
 
-    // Restaurant information
+    // Full restaurant information
     const restaurantInfo = [
       'Ramuri Restaurante & Cervecería',
       'Av. Revolución 123, Tijuana, BC',
+      `Table: ${order.table}`,
       'Tel: 664-123-4567',
       `Fecha: ${date}      Hora: ${time}`,
       `Mesero: Carlos`
     ].join('\n');
 
-    // Build the COMPLETELY REVERSED receipt for thermal printer
-    // Because thermal printers actually print from the end of the buffer to the beginning
+    // Add pre-padding to ensure no content is lost (more padding)
+    const padding = '\n\n\n\n\n';
+    
+    // Build the receipt with the sections in the correct order
     return [
-      // This needs to be in REVERSE order of how we want it to appear on the final receipt
-      // Order of sections on the final receipt should be:
-      // 1. Restaurant details
-      // 2. Item table
-      // 3. Totals
-      // 4. Thank you message
-      
-      // So we need to reverse this completely:
-      thankYouSection,       // Will appear at bottom of receipt
-      totalSection,          // Will appear above thank you
-      formattedItems,        // Will appear above totals
+      padding,                // Extra space at beginning to prevent cutting off 
+      restaurantInfo,         // Full restaurant info including name and address
       divider,
       header,
       divider,
-      '\n',
-      restaurantInfo         // Will appear at top of receipt
-    ].reverse().join('\n');  // REVERSE the entire array
+      formattedItems,         // Items
+      totalSection,           // Totals
+      thankYouSection         // Thank you message
+    ].join('\n');
   }
   
   async sendToPrinter(payload: any): Promise<{success: boolean, message: string}> {
