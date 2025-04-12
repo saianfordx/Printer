@@ -260,19 +260,17 @@ export class PrinterService {
     // Format the total section
     const totalSection = [
       divider,
-      `${'Subtotal:'.padEnd(33)}${order.total.toFixed(2)}`,
-      `${'IVA (16%):'.padEnd(33)}${(order.total * 0.16).toFixed(2)}`,
-      `${'Total:'.padEnd(33)}${(order.total * 1.16).toFixed(2)}`
+      `${'Total:'.padEnd(33)}${(order.total).toFixed(2)}`
     ].join('\n');
 
-    // Format thank you message and table
+    // Format thank you message
     const thankYouSection = [
-      `\nGracias por su preferencia!`,
-      `MESA: ${order.table}`
+      `\nGracias por su preferencia!`
     ].join('\n');
 
     // Updated restaurant information
     const restaurantInfo = [
+      'TEMPLO RAMURI',
       'HYGGELISH SPACES',
       'RFC: HSP231229S13',
       'Avenida Melchor Ocampo 2013 Zona Centro, Tijuana, BC',
@@ -284,7 +282,7 @@ export class PrinterService {
     ].join('\n');
 
     // Add pre-padding to ensure no content is lost (more padding)
-    const padding = '\n\n\n\n\n';
+    const padding = '\n\n\n\n\n\n\n';
     
     // Build the receipt with the sections in the correct order
     return [
