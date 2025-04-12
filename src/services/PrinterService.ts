@@ -238,15 +238,6 @@ export class PrinterService {
       hour12: false
     });
 
-    // Restaurant information - Replace with actual restaurant info
-    const restaurantInfo = [
-      'Ramuri Restaurante & Cervecería',
-      'Av. Revolución 123, Tijuana, BC',
-      'Tel: 664-123-4567',
-      `Fecha: ${date}      Hora: ${time}`,
-      `Mesero: Carlos`
-    ].join('\n');
-
     // Create divider line
     const divider = '---------------------------------------';
 
@@ -271,8 +262,41 @@ export class PrinterService {
       `${'Total:'.padEnd(33)}${(order.total * 1.16).toFixed(2)}`
     ].join('\n');
 
-    // Build the complete receipt
-    return `${restaurantInfo}\n\n${divider}\n${header}\n${divider}\n${formattedItems}\n${totalSection}\n\nGracias por su preferencia!\nTable: ${order.table}\n`;
+    // Format thank you message and table
+    const thankYouSection = [
+      `\nGracias por su preferencia!`,
+      `Table: ${order.table}`
+    ].join('\n');
+
+    // Restaurant information
+    const restaurantInfo = [
+      'Ramuri Restaurante & Cervecería',
+      'Av. Revolución 123, Tijuana, BC',
+      'Tel: 664-123-4567',
+      `Fecha: ${date}      Hora: ${time}`,
+      `Mesero: Carlos`
+    ].join('\n');
+
+    // Build the COMPLETELY REVERSED receipt for thermal printer
+    // Because thermal printers actually print from the end of the buffer to the beginning
+    return [
+      // This needs to be in REVERSE order of how we want it to appear on the final receipt
+      // Order of sections on the final receipt should be:
+      // 1. Restaurant details
+      // 2. Item table
+      // 3. Totals
+      // 4. Thank you message
+      
+      // So we need to reverse this completely:
+      thankYouSection,       // Will appear at bottom of receipt
+      totalSection,          // Will appear above thank you
+      formattedItems,        // Will appear above totals
+      divider,
+      header,
+      divider,
+      '\n',
+      restaurantInfo         // Will appear at top of receipt
+    ].reverse().join('\n');  // REVERSE the entire array
   }
   
   async sendToPrinter(payload: any): Promise<{success: boolean, message: string}> {
