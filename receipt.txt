@@ -1,4 +1,4 @@
-
+@a0
 
 
 
@@ -12,8 +12,8 @@ RFC: HSP231229S13
 Avenida Melchor Ocampo 2013 Zona Centro, Tijuana, BC
 CP 22000
 Tel: (663) 123-5595
-FECHA: 11/04/2025    HORA: 18:36
-Número de folio: 526C91B4
+FECHA: 11/04/2025    HORA: 18:49
+Número de folio: A3376235
 MESA: M1         MESERO: Carlos
 ---------------------------------------
 Cant    Producto                P. Unit    Total
@@ -24,3 +24,7 @@ Cant    Producto                P. Unit    Total
 Total:                           175.00
 
 Gracias por su preferencia!
+
+
+
+m

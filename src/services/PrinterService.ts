@@ -56,10 +56,11 @@ export class PrinterService {
       const platform = process.platform;
       
       if (platform === 'darwin') { // macOS
-        // Changed to use a direct command that works reliably on macOS
-        const { stdout } = await execPromise('lpstat -p');
+        // Get printer list using lpstat which is more reliable on macOS
+        const { stdout } = await execPromise('lpstat -p | grep -v "disabled"');
         console.log('Raw lpstat output:', stdout); // Debug log
         
+        // Extract printer names from lpstat output
         detectedPrinters = stdout
           .split('\n')
           .filter(line => line.trim() !== '')
@@ -85,9 +86,6 @@ export class PrinterService {
           .map(line => line.trim());
       }
       
-      // Clear console log for better visibility
-      console.clear();
-      
       // Log whether printers were detected
       if (detectedPrinters.length > 0) {
         console.log('\n========== PRINTER DETECTION ==========');
@@ -98,16 +96,17 @@ export class PrinterService {
         });
         console.log('=======================================\n');
         
-        // Initialize the first printer found using a more direct approach
+        // Initialize the printer using correct configuration
         try {
-          // For macOS, use direct CUPS printer name
+          // For macOS and other platforms, use the correct printer name and configuration
           this.printer = new ThermalPrinter({
             type: PrinterTypes.EPSON,
-            interface: platform === 'darwin' ? `GHIA_GTP801` : `printer:${detectedPrinters[0]}`,
+            interface: platform === 'darwin' ? detectedPrinters[0] : `printer:${detectedPrinters[0]}`,
             options: {
               timeout: 8000
             }
           });
+          
           this.printerFound = true;
           console.log(`Successfully initialized printer: ${detectedPrinters[0]}`);
         } catch (error) {
@@ -119,7 +118,6 @@ export class PrinterService {
         console.log('❌ NO PRINTERS DETECTED');
         console.log('=======================================\n');
         
-        // Don't fall back to mock printer
         this.printerFound = false;
       }
       
@@ -207,12 +205,32 @@ export class PrinterService {
       console.log(receiptContent);
       console.log('------------------------------');
 
+      // Define thermal printer control codes for proper text formatting
+      // Initialize printer
+      const ESC = '\x1B';
+      const INITIALIZE = `${ESC}@`;
+      // Set text justification to left
+      const JUSTIFY_LEFT = `${ESC}a0`;
+      // Line feed and cut paper after printing
+      const CUT_PAPER = `${ESC}m`;
+      
+      // Create properly formatted content with control codes
+      const thermalContent = `${INITIALIZE}${JUSTIFY_LEFT}${receiptContent}\n\n\n\n${CUT_PAPER}`;
+
       // Write to file
-      await fs.writeFileSync(this.receiptFilePath, receiptContent);
+      await fs.writeFileSync(this.receiptFilePath, thermalContent);
       
       // Use system command to print with raw option
-      const execPromise = await promisify(exec);
-      await execPromise(`lpr -P ${this.printerList[0]} -o raw ${this.receiptFilePath}`);
+      const execPromise = promisify(exec);
+      
+      // For macOS, use the correct raw printing command
+      if (process.platform === 'darwin') {
+        // On macOS, use lp with raw option to ensure control codes are preserved
+        await execPromise(`lp -d ${this.printerList[0]} -o raw ${this.receiptFilePath}`);
+      } else {
+        // For other platforms, use lpr
+        await execPromise(`lpr -P ${this.printerList[0]} -o raw ${this.receiptFilePath}`);
+      }
       
       console.log('✅ PRINT JOB SENT');
       
