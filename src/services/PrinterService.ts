@@ -238,6 +238,9 @@ export class PrinterService {
       hour12: false
     });
 
+    // Generate random UUID for folio number
+    const folioNumber = this.generateUUID();
+
     // Create divider line
     const divider = '---------------------------------------';
 
@@ -265,17 +268,19 @@ export class PrinterService {
     // Format thank you message and table
     const thankYouSection = [
       `\nGracias por su preferencia!`,
-      `Table: ${order.table}`
+      `MESA: ${order.table}`
     ].join('\n');
 
-    // Full restaurant information
+    // Updated restaurant information
     const restaurantInfo = [
-      'Ramuri Restaurante & Cervecería',
-      'Av. Revolución 123, Tijuana, BC',
-      `Table: ${order.table}`,
-      'Tel: 664-123-4567',
-      `Fecha: ${date}      Hora: ${time}`,
-      `Mesero: Carlos`
+      'HYGGELISH SPACES',
+      'RFC: HSP231229S13',
+      'Avenida Melchor Ocampo 2013 Zona Centro, Tijuana, BC',
+      'CP 22000',
+      'Tel: (663) 123-5595',
+      `FECHA: ${date}    HORA: ${time}`,
+      `Número de folio: ${folioNumber}`,
+      `MESA: ${order.table}         MESERO: Carlos`
     ].join('\n');
 
     // Add pre-padding to ensure no content is lost (more padding)
@@ -292,6 +297,15 @@ export class PrinterService {
       totalSection,           // Totals
       thankYouSection         // Thank you message
     ].join('\n');
+  }
+  
+  // Helper to generate UUID for folio
+  private generateUUID(): string {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      const r = Math.random() * 16 | 0;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    }).substring(0, 8).toUpperCase(); // Using first 8 chars for brevity
   }
   
   async sendToPrinter(payload: any): Promise<{success: boolean, message: string}> {
